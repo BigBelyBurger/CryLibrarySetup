@@ -116,3 +116,35 @@ If you do not want to be spammed by Cry tests, simply comment out the "echo" and
 Once all the errors have been fixed, you should be set and can run the Cry Library ! Congratulations, crack yourself a fresh beer, you deserve it.
 
 ## A few helpfull tips for running Cry
+
+### Setting the number of particles to be created
+
+Go into your macro file (in the test_cry example, this would "cmd.file") and edit the number after "/run/beamOn"
+
+### Modifying the particles being created
+
+Once again, go into your macro file and change the "/CRY/input returnPARTICLE_NAME" to 0 or 1 for false or true.
+
+### Creating a random number generator
+
+It may come in handy to modify the way the CRY library creates particles by changing the random number generator (for example, when creating dinstinct files of generated particles). To do so, go into "PrimaryGeneratorAction.cc" and change all the random number generators (they can easily be spotted by looking for the comment "//Set random number generator". Here is an RNG function I found in a previous paper on CRY:
+```
+// set random number generator
+    CLHEP::HepRandomEngine* MyRandomEngine = CLHEP::HepRandom::getTheEngine();
+    double t1 = 181317092024;
+    long seedValue = (long) t1;
+    
+    MyRandomEngine->setSeed(seedValue, 1);
+    RNGWrapper<CLHEP::HepRandomEngine>::set(MyRandomEngine,&CLHEP::HepRandomEngine::flat);
+    setup->setRandomFunction(RNGWrapper<CLHEP::HepRandomEngine>::rng);
+    InputState=0;
+```
+Remember, whenever your modify the C++ files, you must always run the "make" command again.
+
+### Modifying the "test_cry"
+
+First of all, the name of the file can be changed at will. You may also want to add several macro files that must be run. Doing so is simple, just add a new line just like the one below "# run example problem". These macros will be run sequentially so don't worry about overloading your server or overwritting your files.
+
+### Actually simulating your particles
+
+If you have a geant4 program ready, with an idea of what you want to simulate, you can use the CRY library and setting the tracking to 1 (in your macro file, write the command "/tracking/verbose 1"), this will simulate particles just like in geant4.
